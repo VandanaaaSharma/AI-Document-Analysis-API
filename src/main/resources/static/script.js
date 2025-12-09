@@ -55,24 +55,36 @@ function uploadFile() {
     loading.style.display = "block";
 
     fetch("/api/v1/document/analyze", {
-        method: "POST",
-        body: formData
+    method: "POST",
+    body: formData
+})
+    .then(async res => {
+        const text = await res.text(); // Read as text ALWAYS
+
+        if (!res.ok) {
+            throw new Error(text);
+        }
+
+        // Try to convert to JSON
+        const data = JSON.parse(text);
+
+        return data;
     })
-        .then(res => res.json())
-        .then(data => {
-            clearInterval(interval);
+    .then(data => {
+        clearInterval(interval);
+        progressBar.style.width = "100%";
+        loading.style.display = "none";
 
-            progressBar.style.width = "100%";
-            loading.style.display = "none";
+        document.getElementById("resultBox").classList.remove("hidden");
 
-            document.getElementById("resultBox").classList.remove("hidden");
-
-            document.getElementById("summary").textContent = data.summary;
-            document.getElementById("keywords").textContent = data.keywords.join(", ");
-            document.getElementById("sentiment").textContent = data.sentiment;
-        })
+        document.getElementById("summary").textContent = data.summary;
+        document.getElementById("keywords").textContent = data.keywords.join(", ");
+        document.getElementById("sentiment").textContent = data.sentiment;
+    })
         .catch(err => {
-            alert("Error analyzing file");
+            clearInterval(interval);
+            loading.style.display = "none";
+            alert("Error analyzing file:\n" + err.message);
             console.error(err);
         });
-}
+    }

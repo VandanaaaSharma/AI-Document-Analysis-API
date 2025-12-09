@@ -20,23 +20,29 @@ public class OpenAIService {
 
     public AnalysisResponse generateAnalysis(String text) throws Exception {
 
+        // Force strict JSON output
+        String prompt =
+                "Analyze this document text and respond ONLY in valid JSON EXACTLY like this:\n" +
+                "{\n" +
+                "  \"summary\": \"...\",\n" +
+                "  \"keywords\": [\"...\", \"...\"],\n" +
+                "  \"sentiment\": \"Positive | Negative | Neutral\"\n" +
+                "}\n\n" +
+                "Do NOT add explanations, notes, markdown or text outside JSON.\n\nTEXT:\n" + text;
+
+
         JSONObject json = new JSONObject();
         json.put("model", "gpt-4.1-mini");
-
-        // Force JSON output
-        json.put("response_format", new JSONObject().put("type", "json_object"));
 
         JSONArray messages = new JSONArray();
         messages.put(new JSONObject()
                 .put("role", "user")
-                .put("content",
-                        "Analyze this text and return JSON with EXACT structure:\n" +
-                                "{ \"summary\": \"...\", \"keywords\": [\"...\"], \"sentiment\": \"...\" }\n\n" +
-                                "Text:\n" + text)
+                .put("content", prompt)
         );
 
         json.put("messages", messages);
 
+        // request
         Request request = new Request.Builder()
                 .url(API_URL)
                 .addHeader("Authorization", "Bearer " + config.getApiKey())
@@ -44,16 +50,29 @@ public class OpenAIService {
                 .build();
 
         Response response = client.newCall(request).execute();
-        String result = response.body().string();
+        String resultText = response.body().string();
 
-        // Extract GPT message
-        String content = new JSONObject(result)
+        // 1️⃣ Handle OpenAI error response
+        JSONObject resultJson = new JSONObject(resultText);
+
+        if (resultJson.has("error")) {
+            throw new Exception("OpenAI Error: " + resultJson.getJSONObject("error").getString("message"));
+        }
+
+        // 2️⃣ Validate "choices"
+        if (!resultJson.has("choices")) {
+            throw new Exception("OpenAI returned no choices. Full response: " + resultText);
+        }
+
+        // Extract AI message
+        String content = resultJson
                 .getJSONArray("choices")
                 .getJSONObject(0)
                 .getJSONObject("message")
-                .getString("content");
+                .getString("content")
+                .trim();
 
-        // Now ALWAYS valid JSON because response_format forces it
+        // 3️⃣ Parse JSON from AI
         JSONObject ai = new JSONObject(content);
 
         return new AnalysisResponse(
