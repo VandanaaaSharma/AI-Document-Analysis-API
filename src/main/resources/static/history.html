@@ -38,19 +38,21 @@
     if (history.length === 0) {
         list.innerHTML = "<p>No saved summaries or chats yet.</p>";
     }
+history.forEach((item, index) => {
+    const div = document.createElement("div");
+    div.className = "history-item";
 
-    history.forEach((item, index) => {
-        const div = document.createElement("div");
-        div.className = "history-item";
+    div.innerHTML = `
+        <h3>📄 ${item.fileName}</h3>
+        <p><strong>Summary:</strong> ${item.summary}</p>
+        <p class="timestamp">Saved: ${item.timestamp}</p>
 
-        div.innerHTML = `
-            <h3>📄 ${item.title}</h3>
-            <pre>${item.content}</pre>
-            <button onclick="deleteItem(${index})">🗑 Delete</button>
-        `;
+        <button onclick="deleteItem(${index})">🗑 Delete</button>
+    `;
 
-        list.appendChild(div);
-    });
+    list.appendChild(div);
+});
+
 
     function deleteItem(i) {
         history.splice(i, 1);

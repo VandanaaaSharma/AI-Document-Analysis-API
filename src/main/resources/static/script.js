@@ -44,7 +44,16 @@ function uploadFile() {
         method: "POST",
         body: formData
     })
-        .then(res => res.json())
+        .then(async res => {
+
+            // 🔥 If error status → read plain text, do NOT parse JSON
+            if (!res.ok) {
+                const errorText = await res.text();
+                throw new Error(errorText);
+            }
+
+            return res.json(); // safe JSON parsing
+        })
         .then(data => {
 
             document.getElementById("analysisBox").classList.remove("hidden");
@@ -54,12 +63,13 @@ function uploadFile() {
             document.getElementById("keywords").textContent = data.keywords.join(", ");
             document.getElementById("sentiment").textContent = data.sentiment;
 
-            documentText = data.documentText; // for chat
+            documentText = data.summary; // if needed
         })
-        .catch(err => alert("Error: " + err));
+        .catch(err => {
+            alert("⚠️ " + err.message);
+            console.error("UPLOAD ERROR:", err.message);
+        });
 }
-
-
 
 // Send chat message
 function sendChat() {
@@ -98,12 +108,13 @@ function saveChatHistory() {
 
     const history = JSON.parse(localStorage.getItem("history") || "[]");
 
+    const fileName = selectedFile ? selectedFile.name : "Unknown File";
     const summary = document.getElementById("summary").textContent;
 
     history.push({
-        title: selectedFile.name,
-        content: "Summary:\n" + summary + "\n\nChat:\n" +
-            chatHistory.map(m => (m.role === "user" ? "You: " : "AI: ") + m.content).join("\n")
+        fileName: fileName,
+        summary: summary,
+        timestamp: new Date().toLocaleString()
     });
 
     localStorage.setItem("history", JSON.stringify(history));
