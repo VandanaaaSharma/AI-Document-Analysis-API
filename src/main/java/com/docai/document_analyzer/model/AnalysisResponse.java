@@ -11,10 +11,10 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AnalysisResponse {
-
     private String summary;
     private List<String> keywords;
     private String sentiment;
     private String fileName;
     private long fileSize;
+    private String documentText; // 👈 ADD THIS
 }
