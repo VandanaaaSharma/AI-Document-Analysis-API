@@ -1,90 +1,112 @@
 let selectedFile = null;
+let documentText = "";
+let chatHistory = [];
 
-// DARK MODE TOGGLE
-document.getElementById("darkToggle").onclick = () => {
-    document.body.classList.toggle("dark");
-};
+// Navigate
+function goHistory() { window.location.href = "history.html"; }
+function logout() { localStorage.clear(); window.location.href = "login.html"; }
 
-// DRAG & DROP LOGIC
+
+// Drag & Drop
 const dropArea = document.getElementById("dropArea");
 
-dropArea.addEventListener("dragover", (e) => {
+dropArea.addEventListener("dragover", e => {
     e.preventDefault();
     dropArea.classList.add("dragover");
 });
+dropArea.addEventListener("dragleave", () => dropArea.classList.remove("dragover"));
 
-dropArea.addEventListener("dragleave", () => {
-    dropArea.classList.remove("dragover");
-});
-
-dropArea.addEventListener("drop", (e) => {
+dropArea.addEventListener("drop", e => {
     e.preventDefault();
     dropArea.classList.remove("dragover");
-
     selectedFile = e.dataTransfer.files[0];
 });
 
-// UPLOAD + PROGRESS + API REQUEST
+
+// Upload File → AI Analysis
 function uploadFile() {
+
     if (!selectedFile) {
         selectedFile = document.getElementById("fileInput").files[0];
     }
     if (!selectedFile) {
-        alert("Please select a file");
+        alert("Select a PDF or DOCX file");
         return;
     }
 
     const formData = new FormData();
     formData.append("file", selectedFile);
 
-    // Show progress bar
     document.getElementById("progressContainer").style.display = "block";
-
-    let progress = 0;
-    const progressBar = document.getElementById("progressBar");
-    const loading = document.getElementById("loading");
-
-    // Simulate progress animation
-    const interval = setInterval(() => {
-        if (progress < 90) {
-            progress += 10;
-            progressBar.style.width = progress + "%";
-        }
-    }, 200);
-
-    loading.style.display = "block";
+    document.getElementById("loading").style.display = "block";
 
     fetch("/api/v1/document/analyze", {
-    method: "POST",
-    body: formData
-})
-    .then(async res => {
-        const text = await res.text(); // Read as text ALWAYS
-
-        if (!res.ok) {
-            throw new Error(text);
-        }
-
-        // Try to convert to JSON
-        const data = JSON.parse(text);
-
-        return data;
+        method: "POST",
+        body: formData
     })
-    .then(data => {
-        clearInterval(interval);
-        progressBar.style.width = "100%";
-        loading.style.display = "none";
+        .then(res => res.json())
+        .then(data => {
 
-        document.getElementById("resultBox").classList.remove("hidden");
+            document.getElementById("analysisBox").classList.remove("hidden");
+            document.getElementById("chatSection").classList.remove("hidden");
 
-        document.getElementById("summary").textContent = data.summary;
-        document.getElementById("keywords").textContent = data.keywords.join(", ");
-        document.getElementById("sentiment").textContent = data.sentiment;
+            document.getElementById("summary").textContent = data.summary;
+            document.getElementById("keywords").textContent = data.keywords.join(", ");
+            document.getElementById("sentiment").textContent = data.sentiment;
+
+            documentText = data.documentText; // for chat
+        })
+        .catch(err => alert("Error: " + err));
+}
+
+
+
+// Send chat message
+function sendChat() {
+    const input = document.getElementById("chatInput").value.trim();
+    if (!input) return;
+
+    // Display user message
+    const box = document.getElementById("chatBox");
+    box.innerHTML += `<div class="user-msg">${input}</div>`;
+    chatHistory.push({ role: "user", content: input });
+
+    document.getElementById("chatInput").value = "";
+
+    fetch("/api/v1/document/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            documentText,
+            question: input,
+            history: chatHistory
+        })
     })
-        .catch(err => {
-            clearInterval(interval);
-            loading.style.display = "none";
-            alert("Error analyzing file:\n" + err.message);
-            console.error(err);
+        .then(res => res.text())
+        .then(answer => {
+
+            box.innerHTML += `<div class="ai-msg">${answer}</div>`;
+            chatHistory.push({ role: "assistant", content: answer });
+
+            box.scrollTop = box.scrollHeight;
         });
-    }
+}
+
+
+// Save chat & summary
+function saveChatHistory() {
+
+    const history = JSON.parse(localStorage.getItem("history") || "[]");
+
+    const summary = document.getElementById("summary").textContent;
+
+    history.push({
+        title: selectedFile.name,
+        content: "Summary:\n" + summary + "\n\nChat:\n" +
+            chatHistory.map(m => (m.role === "user" ? "You: " : "AI: ") + m.content).join("\n")
+    });
+
+    localStorage.setItem("history", JSON.stringify(history));
+
+    alert("Saved!");
+}

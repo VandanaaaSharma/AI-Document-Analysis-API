@@ -2,50 +2,72 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Document Analyzer Dashboard</title>
+    <title>AI Document Analyzer</title>
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
-    <header>
-        <h1>📄 AI Document Analyzer</h1>
-        <button id="darkToggle">🌙</button>
-    </header>
+<header>
+    <h1>📄 AI Document Analyzer</h1>
 
-    <div class="card glass">
+    <div class="header-buttons">
+        <button onclick="goHistory()">📚 History</button>
+        <button onclick="logout()">🚪 Logout</button>
+    </div>
+</header>
+
+<div class="container">
+
+    <!-- Upload Section -->
+    <div class="card glass" id="uploadSection">
 
         <h2>Upload Document</h2>
 
-        <!-- Drag & Drop Area -->
         <div id="dropArea" class="drop-area">
-            <p>Drag & Drop PDF/DOCX here</p>
+            <p>Drag & Drop PDF/DOCX</p>
             <p class="or">or</p>
             <input type="file" id="fileInput" accept=".pdf,.docx">
         </div>
 
-        <button class="btn" onclick="uploadFile()">Analyze</button>
+        <button class="btn" onclick="uploadFile()">Analyze Document</button>
 
-        <!-- PROGRESS BAR -->
         <div id="progressContainer" class="progress-container">
             <div id="progressBar" class="progress-bar"></div>
         </div>
 
-        <!-- Loading Animation -->
-        <div id="loading" class="loading">⏳ Analyzing document...</div>
-
-        <!-- Result Box -->
-        <div id="resultBox" class="result-box hidden">
-            <h3>Summary</h3>
-            <p id="summary"></p>
-
-            <h3>Keywords</h3>
-            <p id="keywords"></p>
-
-            <h3>Sentiment</h3>
-            <p id="sentiment"></p>
-        </div>
+        <div id="loading" class="loading">⏳ Processing...</div>
     </div>
 
+    <!-- AI Results -->
+    <div class="card glass hidden" id="analysisBox">
+        <h2>Analysis Result</h2>
+
+        <h3>Summary</h3>
+        <p id="summary"></p>
+
+        <h3>Keywords</h3>
+        <p id="keywords"></p>
+
+        <h3>Sentiment</h3>
+        <p id="sentiment"></p>
+    </div>
+
+    <!-- Chat Section -->
+    <div class="card glass hidden" id="chatSection">
+        <h2>Chat With Document</h2>
+
+        <div id="chatBox" class="chat-box"></div>
+
+        <textarea id="chatInput" placeholder="Ask a question..."></textarea>
+
+        <button class="btn" onclick="sendChat()">Send</button>
+        <button class="btn save-btn" onclick="saveChatHistory()">💾 Save Conversation</button>
+    </div>
+
+</div>
+
 <script src="script.js"></script>
+
 </body>
 </html>

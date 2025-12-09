@@ -1,121 +1,110 @@
-/* Global */
 body {
     margin: 0;
-    font-family: "Segoe UI", sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    transition: background 0.3s, color 0.3s;
+    background: #0f172a;
+    color: white;
+    font-family: system-ui;
 }
 
-/* Light & Dark Themes */
-:root {
-    --bg: #f0f2f5;
-    --card-bg: rgba(255,255,255,0.6);
-    --text: #222;
-    --border: rgba(0,0,0,0.1);
-}
-.dark {
-    --bg: #1e1e1e;
-    --card-bg: rgba(30,30,30,0.6);
-    --text: #eee;
-    --border: rgba(255,255,255,0.2);
-}
-
-/* Header */
 header {
     display: flex;
     justify-content: space-between;
-    padding: 15px 25px;
-    background: var(--card-bg);
+    padding: 20px;
+    background: rgba(255,255,255,0.05);
     backdrop-filter: blur(10px);
-    border-bottom: 1px solid var(--border);
+    border-bottom: 1px solid rgba(255,255,255,0.1);
 }
-header h1 {
-    margin: 0;
-}
-#darkToggle {
-    padding: 8px 12px;
+
+.header-buttons button {
+    margin-left: 10px;
+    padding: 10px 16px;
+    border-radius: 12px;
     border: none;
-    background: #4f46e5;
-    color: white;
-    border-radius: 8px;
+    background: #38bdf8;
+    color: black;
     cursor: pointer;
-}
-
-/* Card */
-.card {
-    width: 500px;
-    margin: 40px auto;
-    padding: 25px;
-    border-radius: 18px;
-    border: 1px solid var(--border);
-}
-.glass {
-    background: var(--card-bg);
-    backdrop-filter: blur(15px);
-}
-
-/* Upload Area */
-.drop-area {
-    margin-top: 20px;
-    padding: 30px;
-    border: 2px dashed var(--border);
-    border-radius: 15px;
-    text-align: center;
-}
-.drop-area.dragover {
-    background: rgba(100,100,255,0.1);
-    border-color: #4f46e5;
-}
-.or {
-    margin: 8px 0;
     font-weight: bold;
 }
 
-/* Buttons */
-.btn {
-    margin-top: 15px;
-    padding: 12px 20px;
-    background: #4f46e5;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-}
-.btn:hover {
-    background: #4338ca;
+.container {
+    width: 90%;
+    margin: auto;
+    padding-top: 20px;
 }
 
-/* Loading */
-.loading {
-    margin-top: 15px;
-    display: none;
-}
-
-/* Progress Bar */
-.progress-container {
-    margin: 15px 0;
-    width: 100%;
-    height: 8px;
-    background: var(--border);
-    border-radius: 5px;
-    display: none;
-}
-.progress-bar {
-    width: 0%;
-    height: 100%;
-    background: #4f46e5;
-    border-radius: 5px;
-    transition: width 0.4s;
-}
-
-/* Result Box */
-.result-box {
-    margin-top: 20px;
+.card.glass {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.2);
     padding: 20px;
-    border-radius: 12px;
-    background: rgba(0, 0, 0, 0.05);
+    margin-bottom: 25px;
+    border-radius: 16px;
 }
-.hidden {
+
+.drop-area {
+    padding: 20px;
+    border: 2px dashed #38bdf8;
+    border-radius: 12px;
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+.btn {
+    padding: 12px 20px;
+    background: #38bdf8;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: bold;
+    width: 100%;
+}
+
+.loading { display: none; margin-top: 10px; }
+
+.progress-container {
+    margin-top: 15px;
+    height: 8px;
+    background: #1e293b;
+    border-radius: 6px;
     display: none;
+}
+
+.progress-bar {
+    height: 8px;
+    width: 0%;
+    background: #38bdf8;
+    border-radius: 6px;
+}
+
+.hidden { display: none; }
+
+.chat-box {
+    background: rgba(255,255,255,0.05);
+    padding: 12px;
+    height: 250px;
+    overflow-y: auto;
+    border-radius: 12px;
+    margin-bottom: 10px;
+}
+
+.user-msg {
+    background: #38bdf8;
+    color: black;
+    padding: 10px;
+    margin: 8px;
+    border-radius: 12px;
+    text-align: right;
+}
+
+.ai-msg {
+    background: rgba(255,255,255,0.1);
+    padding: 10px;
+    margin: 8px;
+    border-radius: 12px;
+}
+
+textarea {
+    width: 100%;
+    height: 60px;
+    border-radius: 12px;
+    border: none;
+    padding: 10px;
 }
