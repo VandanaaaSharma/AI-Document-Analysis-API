@@ -134,10 +134,41 @@ body {
 }
 
 .send-btn {
-    background: #4ade80;
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, #0ea5e9, #38bdf8);
+    color: rgb(8, 101, 129);
+    font-size: 1rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    margin-top: 8px;
+    transition: 0.25s ease;
 }
+
 .send-btn:hover {
-    background: #86efac;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 18px rgba(14,165,233,0.5);
+}
+
+.save-btn {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, #10b981, #34d399);
+    color: rgb(12, 120, 134);
+    font-size: 1rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: 0.25s ease;
+}
+
+.save-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 18px rgba(16,185,129,0.5);
 }
 
 /* ---------------- PROGRESS BAR ---------------- */

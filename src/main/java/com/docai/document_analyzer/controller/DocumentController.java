@@ -1,7 +1,6 @@
 package com.docai.document_analyzer.controller;
 
 import com.docai.document_analyzer.model.ChatRequest;
-import com.docai.document_analyzer.model.AnalysisResponse;
 import com.docai.document_analyzer.service.DocumentService;
 import com.docai.document_analyzer.service.OpenAIService;
 import org.springframework.http.ResponseEntity;

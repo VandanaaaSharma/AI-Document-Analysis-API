@@ -3,79 +3,182 @@
 <head>
     <meta charset="UTF-8">
     <title>AI Document Analyzer</title>
-    <link rel="stylesheet" href="style.css">
+
+    <style>
+        body {
+            margin: 0;
+            background: #0f172a;
+            color: white;
+            font-family: "Inter", sans-serif;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            padding: 20px;
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .container { width: 90%; margin: auto; padding-top: 20px; }
+
+        .glass-nav, .card {
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+
+        .drop-area {
+            padding: 20px;
+            border: 2px dashed #38bdf8;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .drop-area.dragover {
+            background: rgba(56,189,248,0.2);
+            border-color: white;
+        }
+
+        .upload-label {
+            padding: 10px 20px;
+            background: #38bdf8;
+            border-radius: 8px;
+            color: black;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .upload-label input { display: none; }
+
+        .selected-file {
+            font-size: 0.9rem;
+            margin-top: 8px;
+            color: #38bdf8;
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border-radius: 12px;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            width: 100%;
+            margin-top: 15px;
+        }
+
+        .primary-btn { background: #38bdf8; color: black; }
+        .primary-btn:disabled {
+            background: gray;
+            color: #444;
+            cursor: not-allowed;
+        }
+
+        .chat-box {
+            background: rgba(255,255,255,0.05);
+            padding: 12px;
+            height: 250px;
+            overflow-y: auto;
+            border-radius: 12px;
+            margin-bottom: 10px;
+        }
+
+        .user-msg {
+            background: #38bdf8;
+            color: black;
+            padding: 10px;
+            margin: 8px;
+            border-radius: 12px;
+            text-align: right;
+        }
+
+        .ai-msg {
+            background: rgba(255,255,255,0.1);
+            padding: 10px;
+            margin: 8px;
+            border-radius: 12px;
+        }
+
+        textarea {
+            width: 100%;
+            height: 60px;
+            border-radius: 12px;
+            border: none;
+            padding: 10px;
+        }
+
+        .hidden { display: none; }
+
+        .loading { display: none; margin-top: 10px; color: #38bdf8; }
+        .progress-container { height: 8px; background: #1e293b; border-radius: 6px; display: none; }
+        .progress-bar { height: 8px; width: 0%; background: #38bdf8; border-radius: 6px; }
+    </style>
 </head>
 
 <body>
 
-<!-- Top Navigation -->
 <header class="glass-nav">
     <h1 class="logo">🌐 AI Document Analyzer</h1>
-
-    <div class="header-buttons">
-        <button class="nav-btn" onclick="goHistory()">📚 History</button>
-        <button class="nav-btn logout" onclick="logout()">🚪 Logout</button>
+    <div>
+        <button onclick="goHistory()">📚 History</button>
+        <button onclick="logout()">🚪 Logout</button>
     </div>
 </header>
 
-<div class="container fade-in">
+<div class="container">
 
-    <!-- Upload Area -->
-    <div class="card glass fade-in" id="uploadSection">
+    <!-- Upload Section -->
+    <div class="card" id="uploadSection">
+        <h2>📤 Upload Your Document</h2>
+        <p>PDF or DOCX files supported</p>
 
-        <h2 class="section-title">📤 Upload Your Document</h2>
-        <p class="section-subtitle">PDF or DOCX files supported</p>
-
-        <!-- Upload Box -->
         <div id="dropArea" class="drop-area">
-            <p class="drop-text">Drag & Drop your file here</p>
-            <p class="or">or</p>
+            <p>Drag & Drop your file here</p>
+            <p>or</p>
+
             <label class="upload-label">
                 Choose File
-                <input type="file" id="fileInput" accept=".pdf,.docx">
+                <input type="file" id="fileInput" accept=".pdf,.docx" onchange="showFileName()">
             </label>
+
+            <p id="fileNameLabel" class="selected-file"></p>
         </div>
 
-        <button class="btn primary-btn" onclick="uploadFile()">✨ Analyze Document</button>
+        <button class="btn primary-btn" id="analyzeBtn" onclick="uploadFile()" disabled>
+            ✨ Analyze Document
+        </button>
 
-        <!-- Progress -->
         <div id="progressContainer" class="progress-container">
-            <div id="progressBar" class="progress-bar neon"></div>
+            <div id="progressBar" class="progress-bar"></div>
         </div>
 
-        <div id="loading" class="loading shimmer">⏳ Analyzing...</div>
+        <div id="loading" class="loading">⏳ Analyzing...</div>
     </div>
 
     <!-- Analysis Result -->
-    <div class="card glass hidden fade-in" id="analysisBox">
-        <h2 class="section-title">📊 AI Analysis</h2>
+    <div class="card hidden" id="analysisBox">
+        <h2>📊 AI Analysis</h2>
 
-        <div class="info-box">
-            <h3>Summary</h3>
-            <p id="summary"></p>
-        </div>
+        <h3>Summary</h3>
+        <p id="summary"></p>
 
-        <div class="info-box">
-            <h3>Keywords</h3>
-            <p id="keywords"></p>
-        </div>
+        <h3>Keywords</h3>
+        <p id="keywords"></p>
 
-        <div class="info-box">
-            <h3>Sentiment</h3>
-            <p id="sentiment"></p>
-        </div>
+        <h3>Sentiment</h3>
+        <p id="sentiment"></p>
     </div>
 
     <!-- Chat Section -->
-    <div class="card glass hidden fade-in" id="chatSection">
-        <h2 class="section-title">💬 Chat With Document</h2>
-
+    <div class="card hidden" id="chatSection">
+        <h2>💬 Chat With Document</h2>
         <div id="chatBox" class="chat-box"></div>
-
-        <textarea id="chatInput" placeholder="Ask anything about this document..." class="chat-input"></textarea>
-
-        <button class="btn send-btn" onclick="sendChat()">Send ➤</button>
-        <button class="btn save-btn" onclick="saveChatHistory()">💾 Save Conversation</button>
+        <textarea id="chatInput" placeholder="Ask anything..."></textarea>
+        <button class="btn" onclick="sendChat()">Send ➤</button>
+        <button class="btn" onclick="saveChatHistory()">💾 Save Conversation</button>
     </div>
 
 </div>
@@ -84,3 +187,4 @@
 
 </body>
 </html>
+

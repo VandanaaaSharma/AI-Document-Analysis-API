@@ -2,35 +2,55 @@ let selectedFile = null;
 let documentText = "";
 let chatHistory = [];
 
-// Navigate
+// NAVIGATION
 function goHistory() { window.location.href = "history.html"; }
-function logout() { localStorage.clear(); window.location.href = "login.html"; }
+function logout() { localStorage.removeItem("currentUser"); window.location.href = "login.html"; }
 
+// Enable Analyze button when file selected
+function enableAnalyzeButton() {
+    document.getElementById("analyzeBtn").disabled = false;
+}
 
-// Drag & Drop
+// Show file name
+function showFileName() {
+    const fileInput = document.getElementById("fileInput");
+    const label = document.getElementById("fileNameLabel");
+
+    if (fileInput.files.length > 0) {
+        selectedFile = fileInput.files[0];
+        label.textContent = "📄 Selected: " + selectedFile.name;
+        enableAnalyzeButton();
+    }
+}
+
+// DRAG & DROP
 const dropArea = document.getElementById("dropArea");
 
 dropArea.addEventListener("dragover", e => {
     e.preventDefault();
     dropArea.classList.add("dragover");
 });
+
 dropArea.addEventListener("dragleave", () => dropArea.classList.remove("dragover"));
 
 dropArea.addEventListener("drop", e => {
     e.preventDefault();
     dropArea.classList.remove("dragover");
+
     selectedFile = e.dataTransfer.files[0];
+    document.getElementById("fileNameLabel").textContent = "📄 Selected: " + selectedFile.name;
+
+    enableAnalyzeButton();
 });
 
-
-// Upload File → AI Analysis
+// ANALYZE DOCUMENT
 function uploadFile() {
 
     if (!selectedFile) {
         selectedFile = document.getElementById("fileInput").files[0];
     }
     if (!selectedFile) {
-        alert("Select a PDF or DOCX file");
+        alert("Please select a PDF or DOCX file");
         return;
     }
 
@@ -45,17 +65,10 @@ function uploadFile() {
         body: formData
     })
         .then(async res => {
-
-            // 🔥 If error status → read plain text, do NOT parse JSON
-            if (!res.ok) {
-                const errorText = await res.text();
-                throw new Error(errorText);
-            }
-
-            return res.json(); // safe JSON parsing
+            if (!res.ok) throw new Error(await res.text());
+            return res.json();
         })
         .then(data => {
-
             document.getElementById("analysisBox").classList.remove("hidden");
             document.getElementById("chatSection").classList.remove("hidden");
 
@@ -63,21 +76,21 @@ function uploadFile() {
             document.getElementById("keywords").textContent = data.keywords.join(", ");
             document.getElementById("sentiment").textContent = data.sentiment;
 
-            documentText = data.summary; // if needed
+            documentText = data.summary;
         })
         .catch(err => {
             alert("⚠️ " + err.message);
-            console.error("UPLOAD ERROR:", err.message);
+            console.error(err);
         });
 }
 
-// Send chat message
+// CHAT
 function sendChat() {
     const input = document.getElementById("chatInput").value.trim();
     if (!input) return;
 
-    // Display user message
     const box = document.getElementById("chatBox");
+
     box.innerHTML += `<div class="user-msg">${input}</div>`;
     chatHistory.push({ role: "user", content: input });
 
@@ -94,30 +107,26 @@ function sendChat() {
     })
         .then(res => res.text())
         .then(answer => {
-
             box.innerHTML += `<div class="ai-msg">${answer}</div>`;
             chatHistory.push({ role: "assistant", content: answer });
-
             box.scrollTop = box.scrollHeight;
         });
 }
 
-
-// Save chat & summary
+// SAVE SUMMARY
 function saveChatHistory() {
 
-    const history = JSON.parse(localStorage.getItem("history") || "[]");
+    const user = localStorage.getItem("currentUser");
+    const key = "history_" + user;
 
-    const fileName = selectedFile ? selectedFile.name : "Unknown File";
-    const summary = document.getElementById("summary").textContent;
+    const history = JSON.parse(localStorage.getItem(key) || "[]");
 
     history.push({
-        fileName: fileName,
-        summary: summary,
+        fileName: selectedFile ? selectedFile.name : "Unknown File",
+        summary: document.getElementById("summary").textContent,
         timestamp: new Date().toLocaleString()
     });
 
-    localStorage.setItem("history", JSON.stringify(history));
-
-    alert("Saved!");
+    localStorage.setItem(key, JSON.stringify(history));
+    alert("Saved to your history!");
 }
