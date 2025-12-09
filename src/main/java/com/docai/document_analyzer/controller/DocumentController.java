@@ -17,14 +17,13 @@ public class DocumentController {
     }
 
     @PostMapping("/analyze")
-public ResponseEntity<?> analyze(@RequestParam("file") MultipartFile file) {
-    try {
-        AnalysisResponse response = service.analyzeDocument(file);
-        return ResponseEntity.ok(response);
-    } catch (Exception e) {
-        e.printStackTrace();
-        return ResponseEntity.status(500).body("Error: " + e.getMessage());
+    public ResponseEntity<?> analyze(@RequestParam("file") MultipartFile file) {
+        try {
+            AnalysisResponse result = service.analyzeDocument(file);
+            return ResponseEntity.ok(result);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).body("Error analyzing document: " + e.getMessage());
+        }
     }
-}
-
 }
