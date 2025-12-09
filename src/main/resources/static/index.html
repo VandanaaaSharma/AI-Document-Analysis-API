@@ -8,60 +8,73 @@
 
 <body>
 
-<header>
-    <h1>📄 AI Document Analyzer</h1>
+<!-- Top Navigation -->
+<header class="glass-nav">
+    <h1 class="logo">🌐 AI Document Analyzer</h1>
 
     <div class="header-buttons">
-        <button onclick="goHistory()">📚 History</button>
-        <button onclick="logout()">🚪 Logout</button>
+        <button class="nav-btn" onclick="goHistory()">📚 History</button>
+        <button class="nav-btn logout" onclick="logout()">🚪 Logout</button>
     </div>
 </header>
 
-<div class="container">
+<div class="container fade-in">
 
-    <!-- Upload Section -->
-    <div class="card glass" id="uploadSection">
+    <!-- Upload Area -->
+    <div class="card glass fade-in" id="uploadSection">
 
-        <h2>Upload Document</h2>
+        <h2 class="section-title">📤 Upload Your Document</h2>
+        <p class="section-subtitle">PDF or DOCX files supported</p>
 
+        <!-- Upload Box -->
         <div id="dropArea" class="drop-area">
-            <p>Drag & Drop PDF/DOCX</p>
+            <p class="drop-text">Drag & Drop your file here</p>
             <p class="or">or</p>
-            <input type="file" id="fileInput" accept=".pdf,.docx">
+            <label class="upload-label">
+                Choose File
+                <input type="file" id="fileInput" accept=".pdf,.docx">
+            </label>
         </div>
 
-        <button class="btn" onclick="uploadFile()">Analyze Document</button>
+        <button class="btn primary-btn" onclick="uploadFile()">✨ Analyze Document</button>
 
+        <!-- Progress -->
         <div id="progressContainer" class="progress-container">
-            <div id="progressBar" class="progress-bar"></div>
+            <div id="progressBar" class="progress-bar neon"></div>
         </div>
 
-        <div id="loading" class="loading">⏳ Processing...</div>
+        <div id="loading" class="loading shimmer">⏳ Analyzing...</div>
     </div>
 
-    <!-- AI Results -->
-    <div class="card glass hidden" id="analysisBox">
-        <h2>Analysis Result</h2>
+    <!-- Analysis Result -->
+    <div class="card glass hidden fade-in" id="analysisBox">
+        <h2 class="section-title">📊 AI Analysis</h2>
 
-        <h3>Summary</h3>
-        <p id="summary"></p>
+        <div class="info-box">
+            <h3>Summary</h3>
+            <p id="summary"></p>
+        </div>
 
-        <h3>Keywords</h3>
-        <p id="keywords"></p>
+        <div class="info-box">
+            <h3>Keywords</h3>
+            <p id="keywords"></p>
+        </div>
 
-        <h3>Sentiment</h3>
-        <p id="sentiment"></p>
+        <div class="info-box">
+            <h3>Sentiment</h3>
+            <p id="sentiment"></p>
+        </div>
     </div>
 
     <!-- Chat Section -->
-    <div class="card glass hidden" id="chatSection">
-        <h2>Chat With Document</h2>
+    <div class="card glass hidden fade-in" id="chatSection">
+        <h2 class="section-title">💬 Chat With Document</h2>
 
         <div id="chatBox" class="chat-box"></div>
 
-        <textarea id="chatInput" placeholder="Ask a question..."></textarea>
+        <textarea id="chatInput" placeholder="Ask anything about this document..." class="chat-input"></textarea>
 
-        <button class="btn" onclick="sendChat()">Send</button>
+        <button class="btn send-btn" onclick="sendChat()">Send ➤</button>
         <button class="btn save-btn" onclick="saveChatHistory()">💾 Save Conversation</button>
     </div>
 
